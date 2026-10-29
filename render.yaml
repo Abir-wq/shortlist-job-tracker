@@ -3,6 +3,7 @@ services:
   - type: web
     name: shortlist
     runtime: node
+    region: ohio
     plan: free
     buildCommand: npm ci --include=dev && npm run build
     startCommand: npm run db:migrate && npm start
