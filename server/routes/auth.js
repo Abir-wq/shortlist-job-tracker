@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { randomUUID, randomBytes } from "node:crypto";
 import bcrypt from "bcryptjs";
-import { rateLimit } from "express-rate-limit";
+import { ipKeyGenerator, rateLimit } from "express-rate-limit";
 import { text, invalid } from "../validation.js";
 
 export function authRoutes(pool) {
@@ -11,6 +11,13 @@ export function authRoutes(pool) {
     limit: 30,
     standardHeaders: "draft-8",
     legacyHeaders: false,
+    keyGenerator: (req) => {
+      const clientIp =
+        req.get("x-nf-client-connection-ip") ||
+        req.ip ||
+        req.socket?.remoteAddress;
+      return clientIp ? ipKeyGenerator(clientIp) : "netlify-unknown";
+    },
     message: { error: "Too many attempts. Please try again in 15 minutes." },
   });
   router.get("/me", async (req, res) => {
