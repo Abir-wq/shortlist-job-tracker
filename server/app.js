@@ -2,7 +2,7 @@ import express from "express";
 import session from "express-session";
 import connectPgSimple from "connect-pg-simple";
 import helmet from "helmet";
-import { rateLimit } from "express-rate-limit";
+import { ipKeyGenerator, rateLimit } from "express-rate-limit";;
 import { timingSafeEqual } from "node:crypto";
 import { fileURLToPath } from "node:url";
 import { authRoutes } from "./routes/auth.js";
@@ -40,8 +40,21 @@ export function createApp(pool, options = {}) {
       limit: 180,
       standardHeaders: "draft-8",
       legacyHeaders: false,
-      message: { error: "Please slow down and try again in a minute." },
-    }),
+     keyGenerator: (req) => {
+      const clientIp =
+        req.get("x-nf-client-connection-ip") ||
+        req.ip ||
+        req.socket?.remoteAddress;
+
+      return clientIp
+        ? ipKeyGenerator(clientIp)
+        : "netlify-unknown";
+    },
+
+    message: {
+      error: "Please slow down and try again in a minute.",
+    },
+  }),
   );
   const PgStore = connectPgSimple(session);
   const store =
