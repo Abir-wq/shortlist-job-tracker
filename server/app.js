@@ -99,7 +99,7 @@ export function createApp(pool, options = {}) {
     if (res.headersSent) return next(error);
     const status = error.status || 500;
     if (status >= 500)
-      console.error("Request failed:", error.code || error.name);
+      console.error("Request failed:", error.stack || error);;
     res.status(status).json({
       error:
         status < 500
