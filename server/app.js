@@ -85,23 +85,27 @@ export function createApp(pool, options = {}) {
   app.use("/api", (req, res) =>
     res.status(404).json({ error: "API route not found." }),
   );
-  const dist = fileURLToPath(new URL("../client/dist", import.meta.url));
-  app.use(express.static(dist));
-  // Express 5 named wildcard: direct visits and refreshes on React routes work.
-  app.get("/{*path}", (req, res) => res.sendFile(`${dist}/index.html`));
+
+  // On a regular Node server Express serves React files. On Netlify, the static
+  // frontend is deployed separately from client/dist, so the function handles API only.
+  if (options.serveFrontend !== false) {
+    const dist = fileURLToPath(new URL("../client/dist", import.meta.url));
+    app.use(express.static(dist));
+    // Express 5 named wildcard: direct visits and refreshes on React routes work.
+    app.get("/{*path}", (req, res) => res.sendFile(`${dist}/index.html`));
+  }
+
   app.use((error, req, res, next) => {
     if (res.headersSent) return next(error);
     const status = error.status || 500;
     if (status >= 500)
       console.error("Request failed:", error.code || error.name);
-    res
-      .status(status)
-      .json({
-        error:
-          status < 500
-            ? error.message
-            : "Something went wrong. Please try again.",
-      });
+    res.status(status).json({
+      error:
+        status < 500
+          ? error.message
+          : "Something went wrong. Please try again.",
+    });
   });
   return app;
 }
