@@ -1,0 +1,41 @@
+{
+  "name": "shortlist",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "A thoughtful job application tracker built with React, Express and PostgreSQL.",
+  "engines": {
+    "node": ">=22.12.0 <25"
+  },
+  "scripts": {
+    "setup": "node scripts/setup.js",
+    "dev": "concurrently -k -n API,WEB \"npm run dev:server\" \"npm run dev:client\"",
+    "dev:server": "node --watch server/index.js",
+    "dev:client": "vite --config client/vite.config.js --host 0.0.0.0",
+    "build": "vite build --config client/vite.config.js",
+    "start": "node server/index.js",
+    "db:migrate": "node server/migrate.js",
+    "test": "node --test --test-concurrency=1 server/tests/*.test.js"
+  },
+  "dependencies": {
+    "bcryptjs": "^3.0.2",
+    "connect-pg-simple": "^10.0.0",
+    "dotenv": "^16.6.1",
+    "express": "^5.1.0",
+    "express-rate-limit": "^8.2.1",
+    "express-session": "^1.18.2",
+    "helmet": "^8.1.0",
+    "pg": "^8.16.3",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "react-router-dom": "^7.9.6",
+    "lucide-react": "^0.468.0"
+  },
+  "devDependencies": {
+    "@electric-sql/pglite": "^0.3.14",
+    "@vitejs/plugin-react": "^5.1.0",
+    "concurrently": "^9.2.1",
+    "supertest": "^7.1.4",
+    "vite": "^7.2.2"
+  }
+}
